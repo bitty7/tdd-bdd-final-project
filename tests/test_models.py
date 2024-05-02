@@ -105,8 +105,8 @@ class TestProductModel(unittest.TestCase):
     # ADD YOUR TEST CASES HERE
     #
     def test_read_a_product(self):
+        """It should Read a Product"""
         product = ProductFactory()
-        logging.debug(product)
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
@@ -166,12 +166,10 @@ class TestProductModel(unittest.TestCase):
         products = ProductFactory.create_batch(5)
         for product in products:
             product.create()
-
         name = products[0].name
         count = len([product for product in products if product.name == name])
         found = Product.find_by_name(name)
         self.assertEqual(found.count(), count)
-
         for product in found:
             self.assertEqual(product.name, name)
 
@@ -210,11 +208,64 @@ class TestProductModel(unittest.TestCase):
         product.create()
 
         serialized_product = product.serialize()
-        print(type(serialized_product['id']))
+        # des_prod = Product.deserialize(serialized_product)
+        # self.assertEqual(product, des_prod)
+        # print(type(serialized_product['id']))
         self.assertIsNotNone(product.id)
         # Fetch it back
         # found_product = Product.find(product.id)
         self.assertEqual(serialized_product['id'], product.id)
         self.assertEqual(serialized_product['name'], product.name)
         self.assertEqual(serialized_product['description'], product.description)
-        # self.assertEqual(serialized_product['price'], product.price)
+
+        self.assertEqual(Decimal( serialized_product['price'] ), product.price)
+    
+    # def test_updating_without_id(self):
+    #     """test none id"""
+    #     product = ProductFactory()
+    #     # logging.debug(product)
+    #     product.create()
+    #     product.id = 1555134
+    #     self.assertRaises(ValueError, product.update())
+    
+    def test_deserialize(self):
+        """test deserialization"""
+        product = ProductFactory()
+        product.create()
+        # print(product)
+        print(product.available)
+        serialized_product = product.serialize()
+        
+
+        des_prod = Product()
+        des_prod.deserialize(serialized_product)
+        des_prod.id = product.id
+        # Product.deserialize(self, data=serialized_product)
+        # self.assertEqual(product, des_prod)
+
+        # self.assertEqual(des_prod.name, product.id)
+        self.assertEqual(des_prod.name, product.name)
+        self.assertEqual(des_prod.description, product.description)
+        self.assertEqual(des_prod.price, product.price)
+
+        # des_prod = Product()
+        # serialized_product['available'] = str(5)
+
+        # des_prod.deserialize(serialized_product)
+        # des_prod.id = product.id
+
+        # self.assertRaises(ValueError, des_prod.deserialize, serialized_product)
+       
+        # with assert_raises(ValueError) as cm:
+        #  call_your_method(p1, p2)
+    
+    # def test_find_price(self):
+    #     product = ProductFactory()
+    #     product.create()
+
+    #     found = Product.find_by_price(product.price)
+    #     # print(found.values.)
+    #     for q in found:
+    #         self.asser
+    #     self.assertEqual(product.find_by_price(product.price).values, found.values)
+
